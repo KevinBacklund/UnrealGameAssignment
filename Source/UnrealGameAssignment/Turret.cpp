@@ -5,6 +5,7 @@
 #include "Enemy.h"	
 #include "EnemyManager.h"
 #include "MyGameMode.h"
+#include "Projectile.h"
 
 // Sets default values
 ATurret::ATurret()
@@ -27,24 +28,14 @@ void ATurret::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (!GetWorld()->GetTimerManager().IsTimerActive(FireTimerHandle))
 	{
-		if (!TargetEnemy)
-		{
-			TargetEnemy = FindTargetEnemy();
-		}
+
+		TargetEnemy = FindTargetEnemy();
+		
 		if (TargetEnemy)
 		{
-			FireAtTargetEnemy();
+			FireAtTargetEnemy(TargetEnemy->GetActorLocation());
 			GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, FireRate, false);
 		}
-	}
-}
-
-void ATurret::FireAtTargetEnemy()
-{
-	if (TargetEnemy)
-	{
-		UE_LOG(MyLog, Warning, TEXT("Firing at enemy: %s"), *TargetEnemy->GetName());
-		TargetEnemy->RecieveDamage(25.0f);
 	}
 }
 

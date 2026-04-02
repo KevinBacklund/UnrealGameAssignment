@@ -4,30 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Enemy.generated.h"
+#include "Test.generated.h"
 
 UCLASS()
-class UNREALGAMEASSIGNMENT_API AEnemy : public AActor
+class UNREALGAMEASSIGNMENT_API ATest : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AEnemy();
+	ATest();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	UFUNCTION(BlueprintCallable)
-	void RecieveDamage(float DmgAmount);
 
-private:
-	FVector TargetLocation;
-	float Health;
-	float Speed;
 };

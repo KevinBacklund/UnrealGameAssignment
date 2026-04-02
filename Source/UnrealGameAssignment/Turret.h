@@ -20,16 +20,20 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void FireAtTargetEnemy(FVector Target);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	void FireAtTargetEnemy();
 	class AEnemy* FindTargetEnemy();
 
 private:
+	UPROPERTY(EditAnywhere)
 	float FireRate = 1.0f;
+	UPROPERTY(EditAnywhere)
 	float FireRange = 1000.0f; 
 	FTimerHandle FireTimerHandle;
 	class AEnemy* TargetEnemy;
