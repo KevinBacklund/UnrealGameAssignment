@@ -30,15 +30,6 @@ void AEnemy::Tick(float DeltaTime)
 	this->SetActorLocation(FMath::VInterpConstantTo(GetActorLocation(), TargetLocation, DeltaTime, Speed));
 }
 
-void AEnemy::RecieveDamage(float DamageAmount)
-{
-	Health -= DamageAmount;
-	if (Health <= 0.0f)
-	{
-		Destroy();
-	}
-}
-
 void AEnemy::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	GetWorld()->GetGameInstance()->GetSubsystem<UEnemyManager>()->RemoveEnemy(this);
