@@ -23,8 +23,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	UFUNCTION(BlueprintCallable)
-	void RecieveDamage(float DmgAmount);
 
 private:
 	FVector TargetLocation;

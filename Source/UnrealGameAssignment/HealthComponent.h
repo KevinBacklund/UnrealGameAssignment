@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, CurrentHealth, float, MaxHealth);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREALGAMEASSIGNMENT_API UHealthComponent : public UActorComponent
@@ -30,6 +31,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool IsDead() const { return CurrentHealth <= 0.0f; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FOnHealthChanged OnHealthChanged;
 
 
 protected:
