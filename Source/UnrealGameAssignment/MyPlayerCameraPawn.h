@@ -15,19 +15,11 @@ public:
 	// Sets default values for this pawn's properties
 	AMyPlayerCameraPawn();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCameraComponent* CameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float movementSpeed = 1000;
+	class USpringArmComponent* SpringArmComponent;
 
 private:
 	void MoveForward(float fValue);
