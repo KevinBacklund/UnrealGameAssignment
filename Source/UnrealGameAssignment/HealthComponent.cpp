@@ -22,6 +22,10 @@ void UHealthComponent::TakeDamage(float DamageAmount)
 	CurrentHealth -= DamageAmount;
 	CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
+	if (IsDead())
+	{
+		OnDeath.Broadcast();
+	}
 }
 
 void UHealthComponent::Heal(float HealAmount)

@@ -29,7 +29,7 @@ void ATurret::Tick(float DeltaTime)
 	if (!GetWorld()->GetTimerManager().IsTimerActive(FireTimerHandle))
 	{
 
-		TargetEnemy = FindTargetEnemy();
+		FindTargetEnemy();
 		
 		if (TargetEnemy)
 		{
@@ -39,7 +39,7 @@ void ATurret::Tick(float DeltaTime)
 	}
 }
 
-class AEnemy* ATurret::FindTargetEnemy()
+void ATurret::FindTargetEnemy()
 {
 	TArray<AEnemy*> Enemies = GetWorld()->GetGameInstance()->GetSubsystem<UEnemyManager>()->GetEnemies();
 	AEnemy* ClosestEnemy = nullptr;
@@ -53,7 +53,7 @@ class AEnemy* ATurret::FindTargetEnemy()
 			ClosestEnemy = Enemy;
 		}
 	}
-	return ClosestEnemy;
+	TargetEnemy = ClosestEnemy;
 }
 
 void ATurret::EndPlay(const EEndPlayReason::Type EndPlayReason)

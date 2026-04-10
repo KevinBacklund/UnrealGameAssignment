@@ -28,7 +28,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	class AEnemy* FindTargetEnemy();
+	void FindTargetEnemy();
 
 private:
 	UPROPERTY(EditAnywhere)
