@@ -63,6 +63,8 @@ void AMyPlayerController::PlaceTurret()
 		UE_LOG(MyLog, Display, TEXT("TURRETSPAWN"));
 		FVector Location = HitResult.Location;
 		Location.Z = 0.0f;
+		float GridSize = 200.0f;
+		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 0.0f);
 		GetWorld()->SpawnActor<ATurret>(TurretClass, Location, FRotator::ZeroRotator);
 	}
 }

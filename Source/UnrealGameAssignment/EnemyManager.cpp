@@ -2,6 +2,7 @@
 
 
 #include "EnemyManager.h"
+#include "Enemy.h"
 #include "MyGameMode.h"
 
 void UEnemyManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -29,4 +30,18 @@ void UEnemyManager::RemoveEnemy(class AEnemy* Enemy)
 TArray<class AEnemy*> UEnemyManager::GetEnemies() const
 {
 	return Enemies;
+}
+
+void UEnemyManager::SpawnNextWave(TArray<TSubclassOf<AEnemy>> EnemiesToSpawn, FVector Location, float SpawnInterval)
+{
+	CurrentWave++;
+	UE_LOG(MyLog, Warning, TEXT("Spawning Enemy in Wave %d"), CurrentWave);
+	for (int i = 0; i < EnemiesToSpawn.Num(); i++)
+	{
+		FTimerHandle SpawnTimer;
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [this, EnemyClass = EnemiesToSpawn[i], Location]()
+			{
+				GetWorld()->SpawnActor<AEnemy>(EnemyClass, Location, FRotator::ZeroRotator);
+			}, i * SpawnInterval, false);
+	}
 }

@@ -22,8 +22,15 @@ public:
 
 	void AddEnemy(class AEnemy* Enemy);
 	void RemoveEnemy(class AEnemy* Enemy);
+	UFUNCTION(BlueprintCallable)
 	TArray<class AEnemy*> GetEnemies() const;
+	UFUNCTION(BlueprintCallable)
+	void SpawnNextWave(TArray<TSubclassOf<AEnemy>> EnemiesToSpawn, FVector Location, float SpawnInterval);
 
 private:
 	TArray<class AEnemy*> Enemies;
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	int CurrentWave = 0;
 };
