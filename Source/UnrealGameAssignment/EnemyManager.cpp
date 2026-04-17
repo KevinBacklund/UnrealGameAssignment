@@ -41,7 +41,9 @@ void UEnemyManager::SpawnNextWave(TArray<TSubclassOf<AEnemy>> EnemiesToSpawn, FV
 		FTimerHandle SpawnTimer;
 		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [this, EnemyClass = EnemiesToSpawn[i], Location]()
 			{
-				GetWorld()->SpawnActor<AEnemy>(EnemyClass, Location, FRotator::ZeroRotator);
+				FVector2D RandLocation2D = FMath::RandPointInCircle(100.0f);
+				FVector SpawnLocation = FVector(Location.X + RandLocation2D.X,Location.Y + RandLocation2D.Y, 0);
+				GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
 			}, i * SpawnInterval, false);
 	}
 }

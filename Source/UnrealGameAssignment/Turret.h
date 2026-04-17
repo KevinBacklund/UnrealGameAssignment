@@ -26,6 +26,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere)
+	float BuildCost;
 
 private:
 	void FindTargetEnemy();

@@ -60,7 +60,8 @@ void AMyPlayerController::PlaceTurret()
 	FHitResult HitResult;
 	if(GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
 	{
-		if (Resources < 10.0f)
+		float BuildCost = 10.0f;
+		if (Resources < BuildCost)
 		{
 			UE_LOG(MyLog, Warning, TEXT("Not enough resources to place turret!"));
 			return;
@@ -75,7 +76,7 @@ void AMyPlayerController::PlaceTurret()
 			return;
 		}
 		GetWorld()->SpawnActor<ATurret>(TurretClass, Location, FRotator::ZeroRotator);
-		Resources -= 10.0f;
+		Resources -= BuildCost;
 		OnResourceChanged.Broadcast(Resources);
 		UE_LOG(MyLog, Display, TEXT("TURRETSPAWN"));
 	}
