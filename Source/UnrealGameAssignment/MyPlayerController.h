@@ -10,6 +10,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResourceChanged, float, CurrentResources);
+
 UCLASS()
 class UNREALGAMEASSIGNMENT_API AMyPlayerController : public APlayerController
 {
@@ -29,4 +32,10 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ATurret> TurretClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Resources;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnResourceChanged OnResourceChanged;
 };

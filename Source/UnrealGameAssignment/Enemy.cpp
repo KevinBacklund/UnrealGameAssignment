@@ -3,6 +3,8 @@
 
 #include "Enemy.h"
 #include "EnemyManager.h"
+#include "HealthComponent.h"
+#include "MyGameMode.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -12,7 +14,7 @@ AEnemy::AEnemy()
 	TargetLocation = FVector::ZeroVector;
 	Health = 100.0f;
 	Speed = 300.0f;
-	this->SetCanBeDamaged(true);
+	Damage = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -36,3 +38,25 @@ void AEnemy::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AEnemy::SetTarget(AActor* Target)
+{
+	if (Target)
+	{
+		TargetActor = Target;
+		TargetLocation = TargetActor->GetActorLocation();
+		if (TargetActor->GetComponentByClass(UHealthComponent::StaticClass()))
+		{
+			UHealthComponent* HealthComponent = Cast<UHealthComponent>(TargetActor->GetComponentByClass(UHealthComponent::StaticClass()));
+			if (HealthComponent)
+			{
+				HealthComponent->OnDeath.AddDynamic(this, &AEnemy::OnTargetDeath);
+			}
+		}
+	}
+}
+
+void AEnemy::OnTargetDeath()
+{
+	TargetActor = nullptr;
+	TargetLocation = FVector::ZeroVector;
+}

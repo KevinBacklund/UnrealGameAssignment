@@ -23,9 +23,19 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
+	void SetTarget(AActor* Target);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Damage;
+
 
 private:
 	FVector TargetLocation;
+	AActor* TargetActor;
 	float Health;
 	float Speed;
+
+	UFUNCTION()
+	void OnTargetDeath();
 };

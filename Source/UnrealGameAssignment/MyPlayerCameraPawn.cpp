@@ -16,7 +16,7 @@ AMyPlayerCameraPawn::AMyPlayerCameraPawn()
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->TargetArmLength = 1000.0f;
+	SpringArmComponent->TargetArmLength = 3000.0f;
 	SpringArmComponent->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
 	SpringArmComponent->bDoCollisionTest = false;
 

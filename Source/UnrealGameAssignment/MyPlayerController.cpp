@@ -50,7 +50,7 @@ void AMyPlayerController::Zoom(float fValue)
 		if (CameraPawn)
 		{
 			CameraPawn->SpringArmComponent->TargetArmLength += fValue * 3000.0f * GetWorld()->GetDeltaSeconds();
-			CameraPawn->SpringArmComponent->TargetArmLength = FMath::Clamp(CameraPawn->SpringArmComponent->TargetArmLength, 300.0f, 2000.0f);
+			CameraPawn->SpringArmComponent->TargetArmLength = FMath::Clamp(CameraPawn->SpringArmComponent->TargetArmLength, 300.0f, 4000.0f);
 		}
 	}
 }
@@ -60,11 +60,23 @@ void AMyPlayerController::PlaceTurret()
 	FHitResult HitResult;
 	if(GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
 	{
-		UE_LOG(MyLog, Display, TEXT("TURRETSPAWN"));
+		if (Resources < 10.0f)
+		{
+			UE_LOG(MyLog, Warning, TEXT("Not enough resources to place turret!"));
+			return;
+		}
 		FVector Location = HitResult.Location;
 		Location.Z = 0.0f;
 		float GridSize = 200.0f;
 		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 0.0f);
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(50.0f)))
+		{
+			UE_LOG(MyLog, Warning, TEXT("Cannot place turret here!"));
+			return;
+		}
 		GetWorld()->SpawnActor<ATurret>(TurretClass, Location, FRotator::ZeroRotator);
+		Resources -= 10.0f;
+		OnResourceChanged.Broadcast(Resources);
+		UE_LOG(MyLog, Display, TEXT("TURRETSPAWN"));
 	}
 }
