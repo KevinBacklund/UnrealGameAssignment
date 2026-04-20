@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Building.h"
 #include "Turret.generated.h"
 
 UCLASS()
-class UNREALGAMEASSIGNMENT_API ATurret : public AActor
+class UNREALGAMEASSIGNMENT_API ATurret : public ABuilding
 {
 	GENERATED_BODY()
 	
@@ -26,8 +27,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	UPROPERTY(EditAnywhere)
-	float BuildCost;
 
 private:
 	void FindTargetEnemy();

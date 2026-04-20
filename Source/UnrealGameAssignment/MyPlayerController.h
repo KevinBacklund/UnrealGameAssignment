@@ -27,15 +27,18 @@ private:
 	void MoveForward(float fValue);
 	void MoveRight(float fValue);
 	void Zoom(float fValue);
-	void PlaceTurret();
+	void PlaceBuilding();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class ATurret> TurretClass;
+	TSubclassOf<class ABuilding> BuildingClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Resources;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnResourceChanged OnResourceChanged;
+
+	UFUNCTION(BlueprintCallable)
+	void AddResources(float Amount);
 };
