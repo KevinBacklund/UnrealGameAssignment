@@ -10,13 +10,16 @@ ABuilding::ABuilding()
 	PrimaryActorTick.bCanEverTick = true;
 	NeedsResource = false;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	MeshComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void ABuilding::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

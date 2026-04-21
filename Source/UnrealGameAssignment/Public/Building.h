@@ -25,4 +25,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	float BuildCost;
 	bool NeedsResource;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	UStaticMeshComponent* MeshComponent;
 };

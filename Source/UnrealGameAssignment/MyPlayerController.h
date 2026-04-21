@@ -29,7 +29,12 @@ private:
 	void Zoom(float fValue);
 	void PlaceBuilding();
 
+	float GridSize;
+	class ABuildingGhost* Ghost;
+
 public:
+	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABuilding> BuildingClass;
 
