@@ -28,8 +28,11 @@ private:
 	void MoveRight(float fValue);
 	void Zoom(float fValue);
 	void PlaceBuilding();
+	void ShowBuildingGhost();
+	void RotateBuilding();
 
 	float GridSize;
+	FRotator BuildingRotation;
 	class ABuildingGhost* Ghost;
 
 public:

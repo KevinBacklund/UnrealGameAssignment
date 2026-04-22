@@ -19,6 +19,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+private:
+	UPROPERTY()
+	UStaticMeshComponent* DirectionPointerMesh;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* StaticMeshComponent;
@@ -27,4 +31,5 @@ public:
 
 	void ValidPosition(bool IsValid);
 	void SetMesh(UStaticMesh* Mesh);
+	void ShowDirectionPointer(bool Show) { if (DirectionPointerMesh) DirectionPointerMesh->SetVisibility(Show); }
 };

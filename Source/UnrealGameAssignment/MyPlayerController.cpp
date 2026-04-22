@@ -27,6 +27,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveRight", this, &AMyPlayerController::MoveRight);
 	InputComponent->BindAxis("Zoom", this, &AMyPlayerController::Zoom);
 	InputComponent->BindAction("LeftMouseButton", IE_Pressed, this, &AMyPlayerController::PlaceBuilding);
+	InputComponent->BindAction("Rotate", IE_Pressed, this, &AMyPlayerController::RotateBuilding);
 }
 
 void AMyPlayerController::Tick(float DeltaTime)
@@ -34,55 +35,7 @@ void AMyPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (BuildingClass)
 	{
-		FHitResult HitResult;
-		bool validLocation = true;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult) && BuildingClass)
-		{
-			float BuildCost = BuildingClass->GetDefaultObject<ABuilding>()->BuildCost;
-			if (Resources < BuildCost)
-			{
-				UE_LOG(MyLog, Warning, TEXT("Not enough resources to place building!"));
-				validLocation = false;
-			}
-			FVector Location = HitResult.Location;
-			Location.Z = 0.0f;
-			Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 0.0f);
-			if (BuildingClass->GetDefaultObject<ABuilding>()->NeedsResource)
-			{
-				TArray<FOverlapResult> Overlaps;
-				GetWorld()->OverlapMultiByChannel(Overlaps, FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(GridSize * 1.5));
-				bool HasResourceNode = false;
-				for (const FOverlapResult& Result : Overlaps)
-				{
-					if (Result.GetActor() && Result.GetActor()->IsA(AResourceNode::StaticClass()))
-					{
-						HasResourceNode = true;
-						break;
-					}
-				}
-				if (!HasResourceNode)
-				{
-					UE_LOG(MyLog, Warning, TEXT("Building must be placed near a resource node!"));
-					validLocation = false;
-				}
-			}
-			if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(50.0f)))
-			{
-				UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
-				validLocation = false;
-			}
-			if (!Ghost)
-			{
-				Ghost = Cast<ABuildingGhost>(GetWorld()->SpawnActor(ABuildingGhost::StaticClass(), &Location, &FRotator::ZeroRotator));
-			}
-			if (Ghost)
-			{
-				UStaticMesh* Mesh = BuildingClass->GetDefaultObject<ABuilding>()->MeshComponent->GetStaticMesh();
-				Ghost->SetMesh(Mesh);
-				Ghost->ValidPosition(validLocation);
-				Ghost->SetActorLocation(Location);
-			}
-		}
+		ShowBuildingGhost();
 	}
 }
 
@@ -125,6 +78,67 @@ void AMyPlayerController::AddResources(float Amount)
 	OnResourceChanged.Broadcast(Resources);
 }
 
+void AMyPlayerController::RotateBuilding()
+{
+	BuildingRotation.Yaw += 90.0f;
+	BuildingRotation.Yaw = FMath::Fmod(BuildingRotation.Yaw, 360.0f);
+}
+
+void AMyPlayerController::ShowBuildingGhost()
+{
+	FHitResult HitResult;
+	bool validLocation = true;
+	if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult) && BuildingClass)
+	{
+		float BuildCost = BuildingClass->GetDefaultObject<ABuilding>()->BuildCost;
+		if (Resources < BuildCost)
+		{
+			UE_LOG(MyLog, Warning, TEXT("Not enough resources to place building!"));
+			validLocation = false;
+		}
+		FVector Location = HitResult.Location;
+		Location.Z = 0.0f;
+		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 50.0f);
+		if (BuildingClass->GetDefaultObject<ABuilding>()->NeedsResource)
+		{
+			TArray<FOverlapResult> Overlaps;
+			GetWorld()->OverlapMultiByChannel(Overlaps, FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(GridSize * 1.5));
+			bool HasResourceNode = false;
+			for (const FOverlapResult& Result : Overlaps)
+			{
+				if (Result.GetActor() && Result.GetActor()->IsA(AResourceNode::StaticClass()))
+				{
+					HasResourceNode = true;
+					break;
+				}
+			}
+			if (!HasResourceNode)
+			{
+				UE_LOG(MyLog, Warning, TEXT("Building must be placed near a resource node!"));
+				validLocation = false;
+			}
+		}
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(50.0f)))
+		{
+			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
+			validLocation = false;
+		}
+		if (!Ghost)
+		{
+			Ghost = Cast<ABuildingGhost>(GetWorld()->SpawnActor(ABuildingGhost::StaticClass(), &Location, &BuildingRotation));
+		}
+		if (Ghost)
+		{
+			UStaticMesh* Mesh = BuildingClass->GetDefaultObject<ABuilding>()->MeshComponent->GetStaticMesh();
+			Ghost->SetMesh(Mesh);
+			Ghost->ValidPosition(validLocation);
+			Ghost->SetActorLocation(Location);
+			Ghost->SetActorRotation(BuildingRotation);
+			Ghost->ShowDirectionPointer(true);
+		}
+	}
+}
+
 void AMyPlayerController::PlaceBuilding()
 {
 	FHitResult HitResult;
@@ -138,7 +152,7 @@ void AMyPlayerController::PlaceBuilding()
 		}
 		FVector Location = HitResult.Location;
 		Location.Z = 0.0f;
-		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 0.0f);
+		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 50.0f);
 		if (BuildingClass->GetDefaultObject<ABuilding>()->NeedsResource) 
 		{
 			TArray<FOverlapResult> Overlaps;
@@ -163,7 +177,7 @@ void AMyPlayerController::PlaceBuilding()
 			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
 			return;
 		}
-		GetWorld()->SpawnActor<ABuilding>(BuildingClass, Location, FRotator::ZeroRotator);
+		GetWorld()->SpawnActor<ABuilding>(BuildingClass, Location, BuildingRotation);
 		Resources -= BuildCost;
 		OnResourceChanged.Broadcast(Resources);
 		UE_LOG(MyLog, Display, TEXT("BUILDING SPAWNED"));

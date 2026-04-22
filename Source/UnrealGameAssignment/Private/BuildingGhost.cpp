@@ -14,10 +14,20 @@ ABuildingGhost::ABuildingGhost()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
+	DirectionPointerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DirectionPointerMesh"));
+	DirectionPointerMesh->SetupAttachment(StaticMeshComponent);
+	DirectionPointerMesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cone.Cone")));	
+	DirectionPointerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DirectionPointerMesh->SetVisibility(false);
+	DirectionPointerMesh->SetRelativeLocation(FVector(GetActorForwardVector() * 100.0f + FVector(0.0f, 0.0f, 20.0f)));
+	DirectionPointerMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 90.0f));
+	DirectionPointerMesh->SetRelativeScale3D(FVector(0.5f, 0.2f, 0.5f));
+
 	Material = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/M_GhostMat.M_GhostMat"));
 	if (Material)
 	{
 		StaticMeshComponent->SetMaterial(0, Material);
+		DirectionPointerMesh->SetMaterial(0, Material);
 	}
 	SetActorEnableCollision(false);
 }
@@ -34,9 +44,14 @@ void ABuildingGhost::ValidPosition(bool IsValid)
 	if (Material)
 	{
 		UMaterialInstanceDynamic* DynamicMaterial = StaticMeshComponent->CreateAndSetMaterialInstanceDynamic(0);
+		UMaterialInstanceDynamic* DirectionPointerDynamicMaterial = DirectionPointerMesh->CreateAndSetMaterialInstanceDynamic(0);
 		if (DynamicMaterial)
 		{
-			DynamicMaterial->SetVectorParameterValue(TEXT("Color"), IsValid ? FLinearColor::Green : FLinearColor::Red);
+			DynamicMaterial->SetVectorParameterValue(TEXT("Colour"), IsValid ? FLinearColor::Green : FLinearColor::Red);
+		}
+		if (DirectionPointerDynamicMaterial)
+		{
+			DirectionPointerDynamicMaterial->SetVectorParameterValue(TEXT("Colour"), IsValid ? FLinearColor::Green : FLinearColor::Red);
 		}
 	}
 }

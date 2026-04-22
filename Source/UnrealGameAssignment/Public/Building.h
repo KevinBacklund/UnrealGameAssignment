@@ -25,7 +25,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	float BuildCost;
 	bool NeedsResource;
+	bool HasInventory;
+	bool InventoryFull;
+	bool InventoryEmpty() { return ItemCount == 0; }
+	int InventoryCapacity;
+
+	void AddItem(AActor* Item);
+	AActor* RemoveItem();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	UStaticMeshComponent* MeshComponent;
+
+private:
+	TArray<AActor*> Inventory;
+	int ItemCount;
 };
