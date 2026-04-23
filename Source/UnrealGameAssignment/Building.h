@@ -26,13 +26,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	float BuildCost;
 	bool NeedsResource;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	bool HasInventory;
 	bool InventoryFull;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	bool Directional;
+	UFUNCTION(BlueprintCallable, Category = "Building")
 	bool InventoryEmpty() { return ItemCount == 0; }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	int InventoryCapacity;
 
 	AActor* AddItem(AActor* Item);
+	UFUNCTION(BlueprintCallable, Category = "Building")
 	AActor* RemoveItem();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")

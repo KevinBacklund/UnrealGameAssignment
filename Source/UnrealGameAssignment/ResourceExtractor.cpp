@@ -23,7 +23,8 @@ void AResourceExtractor::Tick(float DeltaTime)
 		ExtractionTimer = 0.0f;
 		if(!InventoryFull)
 		{
-			AddItem(GetWorld()->SpawnActor<AActor>(ResourceClass, GetActorLocation(), FRotator::ZeroRotator));
+			FVector SpawnLocation = GetActorLocation() - FVector(0.0f, 0.0f, 38.0f);
+			AddItem(GetWorld()->SpawnActor<AActor>(ResourceClass, SpawnLocation, FRotator::ZeroRotator));
 		}
 	}
 }

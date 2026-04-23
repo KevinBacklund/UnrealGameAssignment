@@ -41,7 +41,7 @@ void AConveyorBelt::Tick(float DeltaTime)
 ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
 {
 	FVector Start = MeshComponent->GetComponentLocation() + Direction * 50.0f;
-	FVector End = MeshComponent->GetComponentLocation() + Direction * 100.0f;
+	FVector End = MeshComponent->GetComponentLocation() + Direction * 120.0f;
 	TArray<FHitResult> HitResults;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -65,10 +65,12 @@ void AConveyorBelt::MoveItem(float DeltaTime)
 		if (!DestinationBuilding || DestinationBuilding->InventoryFull)
 		{
 			TargetLocation = GetActorLocation();
+			TargetLocation.Z = CurrentItem->GetActorLocation().Z;
 		}
 		else
 		{
 			TargetLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+			TargetLocation.Z = CurrentItem->GetActorLocation().Z;
 		}
 		if (FVector::Dist(CurrentItem->GetActorLocation(), TargetLocation) < 10.0f)
 		{

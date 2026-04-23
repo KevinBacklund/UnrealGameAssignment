@@ -28,6 +28,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveRight", this, &AMyPlayerController::MoveRight);
 	InputComponent->BindAxis("Zoom", this, &AMyPlayerController::Zoom);
 	InputComponent->BindAction("LeftMouseButton", IE_Pressed, this, &AMyPlayerController::PlaceBuilding);
+	InputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPlayerController::ClearBuildingSelection);
 	InputComponent->BindAction("Rotate", IE_Pressed, this, &AMyPlayerController::RotateBuilding);
 }
 
@@ -85,6 +86,16 @@ void AMyPlayerController::RotateBuilding()
 	BuildingRotation.Yaw = FMath::Fmod(BuildingRotation.Yaw, 360.0f);
 }
 
+void AMyPlayerController::ClearBuildingSelection()
+{
+	BuildingClass = nullptr;
+	if (Ghost)
+	{
+		Ghost->Destroy();
+		Ghost = nullptr;
+	}
+}
+
 void AMyPlayerController::ShowBuildingGhost()
 {
 	FHitResult HitResult;
@@ -117,7 +128,7 @@ void AMyPlayerController::ShowBuildingGhost()
 				validLocation = false;
 			}
 		}
-		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(45.0f)))
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 0), FQuat::Identity, ECC_WorldDynamic, FCollisionShape::MakeSphere(49.0f)))
 		{
 			validLocation = false;
 		}
@@ -132,6 +143,8 @@ void AMyPlayerController::ShowBuildingGhost()
 			Ghost->ValidPosition(validLocation);
 			Ghost->SetActorLocation(Location);
 			Ghost->SetActorRotation(BuildingRotation);
+			Ghost->StaticMeshComponent->SetWorldScale3D(BuildingClass->GetDefaultObject<ABuilding>()->MeshComponent->GetRelativeScale3D());
+			Ghost->StaticMeshComponent->SetRelativeLocation(BuildingClass->GetDefaultObject<ABuilding>()->MeshComponent->GetRelativeLocation());
 			if (BuildingClass->GetDefaultObject<ABuilding>()->Directional)
 			{
 				Ghost->ShowDirectionPointer(true);
@@ -156,7 +169,7 @@ void AMyPlayerController::PlaceBuilding()
 			return;
 		}
 		FVector Location = HitResult.Location;
-		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 50.0f);
+		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 49.0f);
 		if (BuildingClass->GetDefaultObject<ABuilding>()->NeedsResource) 
 		{
 			TArray<FOverlapResult> Overlaps;
@@ -176,7 +189,8 @@ void AMyPlayerController::PlaceBuilding()
 				return;
 			}
 		}
-		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(45.0f)))
+
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 0), FQuat::Identity, ECC_WorldDynamic, FCollisionShape::MakeSphere(49.0f)))
 		{
 			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
 			return;

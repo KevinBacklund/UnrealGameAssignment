@@ -31,6 +31,7 @@ private:
 	void PlaceBuilding();
 	void ShowBuildingGhost();
 	void RotateBuilding();
+	void ClearBuildingSelection();
 
 	float GridSize;
 	FRotator BuildingRotation;
