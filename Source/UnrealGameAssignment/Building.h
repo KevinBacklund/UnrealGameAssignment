@@ -18,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	TArray<AActor*> Inventory;
 
 public:	
 	// Called every frame
@@ -38,6 +39,5 @@ public:
 	UStaticMeshComponent* MeshComponent;
 
 private:
-	TArray<AActor*> Inventory;
 	int ItemCount;
 };

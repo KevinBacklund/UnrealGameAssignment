@@ -27,7 +27,6 @@ void AConveyorBelt::BeginPlay()
 		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PlayerController)
 		{
-			UE_LOG(MyLog, Display, TEXT("Found Player Controller!!"));
 			PlayerController->OnBuildingPlaced.AddDynamic(this, &AConveyorBelt::OnBuildingPlaced);
 		}
 	}
@@ -60,35 +59,40 @@ ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
 
 void AConveyorBelt::MoveItem(float DeltaTime)
 {
-	if(!InventoryFull && SourceBuilding && !SourceBuilding->InventoryEmpty() && !Cast<AConveyorBelt>(SourceBuilding))
-	{
-		CurrentItem = SourceBuilding->RemoveItem();
-		AddItem(CurrentItem);
-	}
 	if (CurrentItem)
 	{
 		FVector TargetLocation;
-		if (DestinationBuilding && !DestinationBuilding->InventoryFull)
+		if (!DestinationBuilding || DestinationBuilding->InventoryFull)
 		{
-			TargetLocation = FVector(DestinationBuilding->GetActorLocation().X, DestinationBuilding->GetActorLocation().Y, CurrentItem->GetActorLocation().Z);
+			TargetLocation = GetActorLocation();
 		}
-		else 
+		else
 		{
-			TargetLocation = FVector(GetActorLocation().X, GetActorLocation().Y, CurrentItem->GetActorLocation().Z);
+			TargetLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 		}
-		CurrentItem->SetActorLocation(CurrentItem->GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
 		if (FVector::Dist(CurrentItem->GetActorLocation(), TargetLocation) < 10.0f)
 		{
-			CurrentItem->SetActorLocation(TargetLocation);
-			if (DestinationBuilding && !DestinationBuilding->InventoryFull)
+			if (DestinationBuilding && DestinationBuilding->AddItem(CurrentItem))
 			{
-				DestinationBuilding->AddItem(CurrentItem);
 				RemoveItem();
 				CurrentItem = nullptr;
 			}
 		}
+		else
+		{
+			CurrentItem->SetActorLocation(FMath::VInterpConstantTo(CurrentItem->GetActorLocation(), TargetLocation, DeltaTime, Speed));
+		}
+	}
+	else if (SourceBuilding && !SourceBuilding->InventoryEmpty() && !Cast<AConveyorBelt>(SourceBuilding))
+	{
+		CurrentItem = SourceBuilding->RemoveItem();
+	}
+	else if (!InventoryEmpty())
+	{
+		CurrentItem = Inventory[0];
 	}
 }
+
 
 void AConveyorBelt::OnBuildingPlaced(ABuilding* PlacedBuilding)
 {

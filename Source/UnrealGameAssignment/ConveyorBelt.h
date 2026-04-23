@@ -25,13 +25,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ConveyorBelt")
 	float Speed;
 
+	UPROPERTY(VisibleAnywhere)
 	ABuilding* DestinationBuilding;
+	UPROPERTY(VisibleAnywhere)
 	ABuilding* SourceBuilding;
 
 private:
 	ABuilding* FindConnectedBuilding(FVector Direction);
 	void MoveItem(float DeltaTime);
+	UPROPERTY(VisibleAnywhere)
 	AActor* CurrentItem;
 
+	UFUNCTION()
 	void OnBuildingPlaced(ABuilding* PlacedBuilding);
 };
