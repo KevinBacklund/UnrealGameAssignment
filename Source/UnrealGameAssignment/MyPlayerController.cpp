@@ -15,7 +15,8 @@ AMyPlayerController::AMyPlayerController()
 {
 	bShowMouseCursor = true;
 	PrimaryActorTick.bCanEverTick = true;
-	GridSize = 200.0f;
+	GridSize = 100.0f;
+	Resources = 500.0f;
 	Ghost = nullptr;
 }
 
@@ -118,7 +119,7 @@ void AMyPlayerController::ShowBuildingGhost()
 				validLocation = false;
 			}
 		}
-		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(50.0f)))
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(45.0f)))
 		{
 			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
 			validLocation = false;
@@ -134,7 +135,14 @@ void AMyPlayerController::ShowBuildingGhost()
 			Ghost->ValidPosition(validLocation);
 			Ghost->SetActorLocation(Location);
 			Ghost->SetActorRotation(BuildingRotation);
-			Ghost->ShowDirectionPointer(true);
+			if (BuildingClass->GetDefaultObject<ABuilding>()->Directional)
+			{
+				Ghost->ShowDirectionPointer(true);
+			}
+			else
+			{
+				Ghost->ShowDirectionPointer(false);
+			}
 		}
 	}
 }
@@ -151,7 +159,6 @@ void AMyPlayerController::PlaceBuilding()
 			return;
 		}
 		FVector Location = HitResult.Location;
-		Location.Z = 0.0f;
 		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 50.0f);
 		if (BuildingClass->GetDefaultObject<ABuilding>()->NeedsResource) 
 		{
@@ -172,12 +179,13 @@ void AMyPlayerController::PlaceBuilding()
 				return;
 			}
 		}
-		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(50.0f)))
+		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(45.0f)))
 		{
 			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
 			return;
 		}
-		GetWorld()->SpawnActor<ABuilding>(BuildingClass, Location, BuildingRotation);
+		ABuilding* PlacedBuilding = GetWorld()->SpawnActor<ABuilding>(BuildingClass, Location, BuildingRotation);
+		OnBuildingPlaced.Broadcast(PlacedBuilding);
 		Resources -= BuildCost;
 		OnResourceChanged.Broadcast(Resources);
 		UE_LOG(MyLog, Display, TEXT("BUILDING SPAWNED"));

@@ -2,15 +2,18 @@
 
 
 #include "ConveyorBelt.h"
+#include "MyPlayerController.h"
 
 AConveyorBelt::AConveyorBelt()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	Speed = 200.0f;
 	HasInventory = true;
+	Directional = true;
 	InventoryCapacity = 1;
 	DestinationBuilding = nullptr;
 	SourceBuilding = nullptr;
+	CurrentItem = nullptr;
 }
 
 void AConveyorBelt::BeginPlay()
@@ -18,25 +21,26 @@ void AConveyorBelt::BeginPlay()
 	Super::BeginPlay();
 	DestinationBuilding = FindConnectedBuilding(GetActorForwardVector());
 	SourceBuilding = FindConnectedBuilding(-GetActorForwardVector());
-	if (Cast<AConveyorBelt>(DestinationBuilding)) 
+	if (!DestinationBuilding || !SourceBuilding)
 	{
-		Cast<AConveyorBelt>(DestinationBuilding)->SourceBuilding = this;
-	}
-	if (Cast<AConveyorBelt>(SourceBuilding)) 
-	{
-		Cast<AConveyorBelt>(SourceBuilding)->DestinationBuilding = this;
+		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PlayerController)
+		{
+			PlayerController->OnBuildingPlaced.AddDynamic(this, &AConveyorBelt::OnBuildingPlaced);
+		}
 	}
 }
 
 void AConveyorBelt::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	MoveItem(DeltaTime);
 }
 
 ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
 {
-	FVector Start = GetActorLocation() + Direction * 100.0f;
-	FVector End = GetActorLocation() + Direction * 200.0f;
+	FVector Start = MeshComponent->GetComponentLocation() + Direction * 50.0f;
+	FVector End = MeshComponent->GetComponentLocation() + Direction * 100.0f;
 	TArray<FHitResult> HitResults;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -54,20 +58,32 @@ ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
 
 void AConveyorBelt::MoveItem(float DeltaTime)
 {
-	if (!InventoryEmpty() && DestinationBuilding && !DestinationBuilding->InventoryFull)
+	if(!InventoryFull && SourceBuilding && !SourceBuilding->InventoryEmpty())
 	{
-		AActor* Item = RemoveItem();
-		FVector Direction = (DestinationBuilding->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-		FVector NewLocation = Item->GetActorLocation() + Direction * Speed * DeltaTime;
-		Item->SetActorLocation(NewLocation);
-		if (FVector::Dist(NewLocation, DestinationBuilding->GetActorLocation()) < 100.0f)
-		{
-			DestinationBuilding->AddItem(Item);
-		}
+		CurrentItem = SourceBuilding->RemoveItem();
+		AddItem(CurrentItem);
 	}
-	if (SourceBuilding && !SourceBuilding->InventoryEmpty() && !InventoryFull && !Cast<AConveyorBelt>(SourceBuilding))
+	if (CurrentItem)
 	{
-		AActor* Item = SourceBuilding->RemoveItem();
-		AddItem(Item);
+		FVector TargetLocation;
+		if (DestinationBuilding && !DestinationBuilding->InventoryFull)
+		{
+			TargetLocation = FVector(DestinationBuilding->GetActorLocation().X, DestinationBuilding->GetActorLocation().Y, CurrentItem->GetActorLocation().Z);
+		}
+		else 
+		{
+			TargetLocation = FVector(GetActorLocation().X, GetActorLocation().Y, CurrentItem->GetActorLocation().Z);
+		}
+		CurrentItem->SetActorLocation(CurrentItem->GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
+		if (FVector::Dist(CurrentItem->GetActorLocation(), TargetLocation) < 10.0f)
+		{
+			CurrentItem->SetActorLocation(TargetLocation);
+			if (DestinationBuilding && !DestinationBuilding->InventoryFull)
+			{
+				DestinationBuilding->AddItem(CurrentItem);
+				RemoveItem();
+				CurrentItem = nullptr;
+			}
+		}
 	}
 }

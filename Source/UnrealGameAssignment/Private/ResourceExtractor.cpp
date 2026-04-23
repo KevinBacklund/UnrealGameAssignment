@@ -5,6 +5,25 @@
 
 AResourceExtractor::AResourceExtractor()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	BuildCost = 50.0f;
 	NeedsResource = true;
+	HasInventory = true;
+	ExtractionRate = 1.0f;
+	ExtractionTimer = 0.0f;
+	InventoryCapacity = 5;
+}
+
+void AResourceExtractor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ExtractionTimer += DeltaTime;
+	if (ExtractionTimer >= 1.0f / ExtractionRate)
+	{
+		ExtractionTimer = 0.0f;
+		if(!InventoryFull)
+		{
+			AddItem(GetWorld()->SpawnActor<AActor>(ResourceClass, GetActorLocation(), FRotator::ZeroRotator));
+		}
+	}
 }

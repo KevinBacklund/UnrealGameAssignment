@@ -16,4 +16,11 @@ class UNREALGAMEASSIGNMENT_API AResourceExtractor : public ABuilding
 	
 public:
 	AResourceExtractor();
+	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource Extraction")
+	float ExtractionRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource Extraction")
+	TSubclassOf<class AActor> ResourceClass;
+private:
+	float ExtractionTimer;
 };

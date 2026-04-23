@@ -27,10 +27,11 @@ public:
 	bool NeedsResource;
 	bool HasInventory;
 	bool InventoryFull;
+	bool Directional;
 	bool InventoryEmpty() { return ItemCount == 0; }
 	int InventoryCapacity;
 
-	void AddItem(AActor* Item);
+	AActor* AddItem(AActor* Item);
 	AActor* RemoveItem();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")

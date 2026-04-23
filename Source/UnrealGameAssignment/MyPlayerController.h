@@ -12,6 +12,7 @@
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResourceChanged, float, CurrentResources);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuildingPlaced,class ABuilding*, PlacedBuilding);
 
 UCLASS()
 class UNREALGAMEASSIGNMENT_API AMyPlayerController : public APlayerController
@@ -46,6 +47,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnResourceChanged OnResourceChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBuildingPlaced OnBuildingPlaced;
 
 	UFUNCTION(BlueprintCallable)
 	void AddResources(float Amount);

@@ -11,6 +11,7 @@ ABuilding::ABuilding()
 	NeedsResource = false;
 	HasInventory = false;
 	InventoryFull = false;
+	Directional = false;
 	InventoryCapacity = 10;
 	ItemCount = 0;
 	BuildCost = 10.0f;
@@ -37,7 +38,7 @@ void ABuilding::Tick(float DeltaTime)
 
 }
 
-void ABuilding::AddItem(AActor* Item)
+AActor* ABuilding::AddItem(AActor* Item)
 {
 	if (ItemCount < InventoryCapacity)
 	{
@@ -47,7 +48,9 @@ void ABuilding::AddItem(AActor* Item)
 		{
 			InventoryFull = true;
 		}
+		return Item;
 	}
+	return nullptr;
 }
 
 AActor* ABuilding::RemoveItem()
