@@ -57,6 +57,11 @@ void AEnemy::SetTarget(AActor* Target)
 
 void AEnemy::OnTargetDeath()
 {
+	UHealthComponent* HealthComponent = Cast<UHealthComponent>(TargetActor->GetComponentByClass(UHealthComponent::StaticClass()));
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.RemoveDynamic(this, &AEnemy::OnTargetDeath);
+	}
 	TargetActor = nullptr;
 	TargetLocation = FVector::ZeroVector;
 }

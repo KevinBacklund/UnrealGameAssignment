@@ -94,7 +94,6 @@ void AMyPlayerController::ShowBuildingGhost()
 		float BuildCost = BuildingClass->GetDefaultObject<ABuilding>()->BuildCost;
 		if (Resources < BuildCost)
 		{
-			UE_LOG(MyLog, Warning, TEXT("Not enough resources to place building!"));
 			validLocation = false;
 		}
 		FVector Location = HitResult.Location;
@@ -115,13 +114,11 @@ void AMyPlayerController::ShowBuildingGhost()
 			}
 			if (!HasResourceNode)
 			{
-				UE_LOG(MyLog, Warning, TEXT("Building must be placed near a resource node!"));
 				validLocation = false;
 			}
 		}
 		if (GetWorld()->OverlapAnyTestByChannel(FVector(Location.X, Location.Y, 60.0f), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(45.0f)))
 		{
-			UE_LOG(MyLog, Warning, TEXT("Cannot place building here!"));
 			validLocation = false;
 		}
 		if (!Ghost)

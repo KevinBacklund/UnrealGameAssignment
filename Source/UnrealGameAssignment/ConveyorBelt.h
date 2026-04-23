@@ -32,4 +32,6 @@ private:
 	ABuilding* FindConnectedBuilding(FVector Direction);
 	void MoveItem(float DeltaTime);
 	AActor* CurrentItem;
+
+	void OnBuildingPlaced(ABuilding* PlacedBuilding);
 };

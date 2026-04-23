@@ -3,6 +3,7 @@
 
 #include "ConveyorBelt.h"
 #include "MyPlayerController.h"
+#include "MyGameMode.h"
 
 AConveyorBelt::AConveyorBelt()
 {
@@ -26,6 +27,7 @@ void AConveyorBelt::BeginPlay()
 		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PlayerController)
 		{
+			UE_LOG(MyLog, Display, TEXT("Found Player Controller!!"));
 			PlayerController->OnBuildingPlaced.AddDynamic(this, &AConveyorBelt::OnBuildingPlaced);
 		}
 	}
@@ -58,7 +60,7 @@ ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
 
 void AConveyorBelt::MoveItem(float DeltaTime)
 {
-	if(!InventoryFull && SourceBuilding && !SourceBuilding->InventoryEmpty())
+	if(!InventoryFull && SourceBuilding && !SourceBuilding->InventoryEmpty() && !Cast<AConveyorBelt>(SourceBuilding))
 	{
 		CurrentItem = SourceBuilding->RemoveItem();
 		AddItem(CurrentItem);
@@ -84,6 +86,26 @@ void AConveyorBelt::MoveItem(float DeltaTime)
 				RemoveItem();
 				CurrentItem = nullptr;
 			}
+		}
+	}
+}
+
+void AConveyorBelt::OnBuildingPlaced(ABuilding* PlacedBuilding)
+{
+	if (!DestinationBuilding)
+	{
+		DestinationBuilding = FindConnectedBuilding(GetActorForwardVector());
+	}
+	if (!SourceBuilding)
+	{
+		SourceBuilding = FindConnectedBuilding(-GetActorForwardVector());
+	}
+	if (DestinationBuilding && SourceBuilding)
+	{
+		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PlayerController)
+		{
+			PlayerController->OnBuildingPlaced.RemoveDynamic(this, &AConveyorBelt::OnBuildingPlaced);
 		}
 	}
 }
