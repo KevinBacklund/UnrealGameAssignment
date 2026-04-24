@@ -61,28 +61,29 @@ void AConveyorBelt::MoveItem(float DeltaTime)
 {
 	if (CurrentItem)
 	{
-		FVector TargetLocation;
+		FVector DestinationLocation = GetActorLocation() + GetActorForwardVector() * 50.0f;
+		DestinationLocation.Z = CurrentItem->GetActorLocation().Z;
+		FVector SelfLocation = GetActorLocation();
+		SelfLocation.Z = CurrentItem->GetActorLocation().Z;
+		if (DestinationBuilding && !DestinationBuilding->InventoryFull)
+		{
+			CurrentItem->SetActorLocation(FMath::VInterpConstantTo(CurrentItem->GetActorLocation(), DestinationLocation, DeltaTime, Speed));
+		}
 		if (!DestinationBuilding || DestinationBuilding->InventoryFull)
 		{
-			TargetLocation = GetActorLocation();
-			TargetLocation.Z = CurrentItem->GetActorLocation().Z;
+			float DotProduct = FVector::DotProduct((CurrentItem->GetActorLocation() - SelfLocation).GetSafeNormal(), GetActorForwardVector());
+			if (DotProduct < 0)
+			{
+				CurrentItem->SetActorLocation(FMath::VInterpConstantTo(CurrentItem->GetActorLocation(), SelfLocation, DeltaTime, Speed));
+			}
 		}
-		else
-		{
-			TargetLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-			TargetLocation.Z = CurrentItem->GetActorLocation().Z;
-		}
-		if (FVector::Dist(CurrentItem->GetActorLocation(), TargetLocation) < 10.0f)
+		if (FVector::Dist(CurrentItem->GetActorLocation(), DestinationLocation) < 10.0f)
 		{
 			if (DestinationBuilding && DestinationBuilding->AddItem(CurrentItem))
 			{
 				RemoveItem();
 				CurrentItem = nullptr;
 			}
-		}
-		else
-		{
-			CurrentItem->SetActorLocation(FMath::VInterpConstantTo(CurrentItem->GetActorLocation(), TargetLocation, DeltaTime, Speed));
 		}
 	}
 	else if (SourceBuilding && !SourceBuilding->InventoryEmpty() && !Cast<AConveyorBelt>(SourceBuilding))
