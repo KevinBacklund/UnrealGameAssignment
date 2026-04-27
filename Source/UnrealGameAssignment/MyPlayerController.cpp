@@ -28,7 +28,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveRight", this, &AMyPlayerController::MoveRight);
 	InputComponent->BindAxis("Zoom", this, &AMyPlayerController::Zoom);
 	InputComponent->BindAction("LeftMouseButton", IE_Pressed, this, &AMyPlayerController::PlaceBuilding);
-	InputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPlayerController::ClearBuildingSelection);
+	InputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPlayerController::DeconstructBuilding);
 	InputComponent->BindAction("Rotate", IE_Pressed, this, &AMyPlayerController::RotateBuilding);
 }
 
@@ -200,5 +200,33 @@ void AMyPlayerController::PlaceBuilding()
 		Resources -= BuildCost;
 		OnResourceChanged.Broadcast(Resources);
 		UE_LOG(MyLog, Display, TEXT("BUILDING SPAWNED"));
+	}
+}
+
+void AMyPlayerController::DeconstructBuilding()
+{
+	ClearBuildingSelection();
+	FHitResult HitResult;
+	if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		FVector Location = HitResult.Location;
+		Location.Z = 0.0f;
+		Location = FVector(FMath::RoundToInt(Location.X / GridSize) * GridSize, FMath::RoundToInt(Location.Y / GridSize) * GridSize, 50.0f);
+		TArray<FOverlapResult> Overlaps;
+		GetWorld()->OverlapMultiByChannel(Overlaps, FVector(Location.X, Location.Y, 50.0f), FQuat::Identity, ECC_WorldDynamic, FCollisionShape::MakeSphere(49.0f));
+		UE_LOG(MyLog, Display, TEXT("OVERLAPS FOUND: %d"), Overlaps.Num());
+		for (const FOverlapResult& Result : Overlaps)
+		{
+			ABuilding* Building = Cast<ABuilding>(Result.GetActor());
+			if (Building && Building->IsDeconstructable)
+			{
+				float RefundAmount = Building->BuildCost * 0.5f;
+				AddResources(RefundAmount);
+				Building->Destroy();
+				OnBuildingDeconstructed.Broadcast();
+				UE_LOG(MyLog, Display, TEXT("BUILDING DECONSTRUCTED"));
+				break;
+			}
+		}
 	}
 }

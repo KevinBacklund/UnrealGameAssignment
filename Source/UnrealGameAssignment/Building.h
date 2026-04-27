@@ -35,6 +35,8 @@ public:
 	bool InventoryEmpty() { return ItemCount == 0; }
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	int InventoryCapacity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	bool IsDeconstructable;
 
 	AActor* AddItem(AActor* Item);
 	UFUNCTION(BlueprintCallable, Category = "Building")

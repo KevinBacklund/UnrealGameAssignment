@@ -20,22 +20,29 @@ AConveyorBelt::AConveyorBelt()
 void AConveyorBelt::BeginPlay()
 {
 	Super::BeginPlay();
-	DestinationBuilding = FindConnectedBuilding(GetActorForwardVector());
-	SourceBuilding = FindConnectedBuilding(-GetActorForwardVector());
-	if (!DestinationBuilding || !SourceBuilding)
-	{
-		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PlayerController)
-		{
-			PlayerController->OnBuildingPlaced.AddDynamic(this, &AConveyorBelt::OnBuildingPlaced);
-		}
-	}
+	UpdateConnectedBuildings();
 }
 
 void AConveyorBelt::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveItem(DeltaTime);
+}
+
+void AConveyorBelt::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		PlayerController->OnBuildingPlaced.RemoveDynamic(this, &AConveyorBelt::OnBuildingPlaced);
+		PlayerController->OnBuildingDeconstructed.RemoveDynamic(this, &AConveyorBelt::OnBuildingDeconstructed);
+	}
+	if (CurrentItem)
+	{
+		CurrentItem->Destroy();
+		CurrentItem = nullptr;
+	}
 }
 
 ABuilding* AConveyorBelt::FindConnectedBuilding(FVector Direction)
@@ -113,6 +120,41 @@ void AConveyorBelt::OnBuildingPlaced(ABuilding* PlacedBuilding)
 		if (PlayerController)
 		{
 			PlayerController->OnBuildingPlaced.RemoveDynamic(this, &AConveyorBelt::OnBuildingPlaced);
+		}
+	}
+}
+
+void AConveyorBelt::OnBuildingDeconstructed()
+{
+	UpdateConnectedBuildings();
+	if (!DestinationBuilding && !SourceBuilding)
+	{
+		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PlayerController)
+		{
+			PlayerController->OnBuildingDeconstructed.RemoveDynamic(this, &AConveyorBelt::OnBuildingDeconstructed);
+		}
+	}
+}
+
+void AConveyorBelt::UpdateConnectedBuildings()
+{
+	DestinationBuilding = FindConnectedBuilding(GetActorForwardVector());
+	SourceBuilding = FindConnectedBuilding(-GetActorForwardVector());
+	if (!DestinationBuilding || !SourceBuilding)
+	{
+		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PlayerController)
+		{
+			PlayerController->OnBuildingPlaced.AddDynamic(this, &AConveyorBelt::OnBuildingPlaced);
+		}
+	}
+	if (DestinationBuilding || SourceBuilding)
+	{
+		AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PlayerController)
+		{
+			PlayerController->OnBuildingDeconstructed.AddDynamic(this, &AConveyorBelt::OnBuildingDeconstructed);
 		}
 	}
 }

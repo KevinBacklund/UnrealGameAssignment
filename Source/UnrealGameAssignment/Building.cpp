@@ -12,6 +12,7 @@ ABuilding::ABuilding()
 	HasInventory = false;
 	InventoryFull = false;
 	Directional = false;
+	IsDeconstructable = true;
 	InventoryCapacity = 10;
 	ItemCount = 0;
 	BuildCost = 10.0f;

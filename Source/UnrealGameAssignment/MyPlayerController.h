@@ -13,6 +13,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResourceChanged, float, CurrentResources);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuildingPlaced,class ABuilding*, PlacedBuilding);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBuildingDeconstructed);
 
 UCLASS()
 class UNREALGAMEASSIGNMENT_API AMyPlayerController : public APlayerController
@@ -32,6 +33,7 @@ private:
 	void ShowBuildingGhost();
 	void RotateBuilding();
 	void ClearBuildingSelection();
+	void DeconstructBuilding();
 
 	float GridSize;
 	FRotator BuildingRotation;
@@ -54,4 +56,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddResources(float Amount);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBuildingDeconstructed OnBuildingDeconstructed;
 };

@@ -13,7 +13,10 @@ UCLASS()
 class UNREALGAMEASSIGNMENT_API AResourceExtractor : public ABuilding
 {
 	GENERATED_BODY()
-	
+protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:
 	AResourceExtractor();
 	virtual void Tick(float DeltaTime) override;

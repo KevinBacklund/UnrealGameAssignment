@@ -14,6 +14,23 @@ AResourceExtractor::AResourceExtractor()
 	InventoryCapacity = 5;
 }
 
+void AResourceExtractor::BeginPlay()
+{
+	Super::BeginPlay();
+}
+void AResourceExtractor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	for (AActor* Item : Inventory)
+	{
+		if (Item)
+		{
+			Item->Destroy();
+		}
+	}
+	Inventory.Empty();
+}
+
 void AResourceExtractor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
