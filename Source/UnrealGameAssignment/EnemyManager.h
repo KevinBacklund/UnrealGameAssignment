@@ -27,8 +27,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnNextWave(TArray<TSubclassOf<AEnemy>> EnemiesToSpawn, FVector Location, float SpawnInterval);
 
+	UFUNCTION(BlueprintCallable)
+	void Reset();
+
 private:
 	TArray<class AEnemy*> Enemies;
+	void SpawnEnemy(TSubclassOf<AEnemy> EnemyClass, FVector Location);
+	void ClearTimers();
 
 public:
 	UPROPERTY(BlueprintReadOnly)

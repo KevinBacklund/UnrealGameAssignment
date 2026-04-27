@@ -39,11 +39,37 @@ void UEnemyManager::SpawnNextWave(TArray<TSubclassOf<AEnemy>> EnemiesToSpawn, FV
 	for (int i = 0; i < EnemiesToSpawn.Num(); i++)
 	{
 		FTimerHandle SpawnTimer;
-		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [this, EnemyClass = EnemiesToSpawn[i], Location]()
-			{
-				FVector2D RandLocation2D = FMath::RandPointInCircle(100.0f);
-				FVector SpawnLocation = FVector(Location.X + RandLocation2D.X,Location.Y + RandLocation2D.Y, 0);
-				GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
-			}, i * SpawnInterval, false);
+		FVector SpawnLocation = FMath::VRand() * 200.0f + Location;
+		SpawnLocation.Z = Location.Z;
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateUObject(this, &UEnemyManager::SpawnEnemy, EnemiesToSpawn[i], SpawnLocation), SpawnInterval * i, false);
 	}
+}
+
+void UEnemyManager::SpawnEnemy(TSubclassOf<AEnemy> EnemyClass, FVector Location)
+{
+	AEnemy* SpawnedEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, Location, FRotator::ZeroRotator);
+	if (SpawnedEnemy)
+	{
+		AddEnemy(SpawnedEnemy);
+	}
+}
+
+void UEnemyManager::Reset()
+{
+	ClearTimers();
+	for (AEnemy* Enemy : Enemies)
+	{
+		if (Enemy)
+		{
+			Enemy->Destroy();
+		}
+	}
+	Enemies.Empty();
+	CurrentWave = 0;
+}
+
+void UEnemyManager::ClearTimers()
+{
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearAllTimersForObject(this);
 }
