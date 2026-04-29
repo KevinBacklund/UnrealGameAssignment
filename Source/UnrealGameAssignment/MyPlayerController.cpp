@@ -205,7 +205,6 @@ void AMyPlayerController::PlaceBuilding()
 
 void AMyPlayerController::DeconstructBuilding()
 {
-	ClearBuildingSelection();
 	FHitResult HitResult;
 	if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
 	{
