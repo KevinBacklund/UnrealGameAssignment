@@ -98,6 +98,8 @@ void AMyPlayerController::ClearBuildingSelection()
 	}
 }
 
+
+//A lot of shared logic with PlaceBuilding() Split out new functions to use for both
 void AMyPlayerController::ShowBuildingGhost()
 {
 	FHitResult HitResult;
