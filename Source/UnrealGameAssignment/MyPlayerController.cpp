@@ -10,6 +10,7 @@
 #include "Engine/OverlapResult.h"
 #include "ResourceNode.h"	
 #include "BuildingGhost.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -30,6 +31,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("LeftMouseButton", IE_Pressed, this, &AMyPlayerController::PlaceBuilding);
 	InputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPlayerController::DeconstructBuilding);
 	InputComponent->BindAction("Rotate", IE_Pressed, this, &AMyPlayerController::RotateBuilding);
+	InputComponent->BindAction("QuitGame", IE_Pressed, this, &AMyPlayerController::Quit);
 }
 
 void AMyPlayerController::Tick(float DeltaTime)
@@ -228,4 +230,9 @@ void AMyPlayerController::DeconstructBuilding()
 			}
 		}
 	}
+}
+
+void AMyPlayerController::Quit() 
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(),this, EQuitPreference::Quit, false);
 }

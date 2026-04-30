@@ -34,6 +34,7 @@ private:
 	void RotateBuilding();
 	void ClearBuildingSelection();
 	void DeconstructBuilding();
+	void Quit();
 
 	float GridSize;
 	FRotator BuildingRotation;
